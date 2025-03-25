@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 use crate::models::{livro::Livro, membro::Membro};
 
-#[derive(Clone)]
+#[derive(Debug, Clone)] // Adicione Debug
 pub struct Database {
     livros: Arc<Mutex<Vec<Livro>>>,
     membros: Arc<Mutex<Vec<Membro>>>,

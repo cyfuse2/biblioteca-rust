@@ -1,14 +1,27 @@
 mod models;
 mod services;
 mod database;
+mod gui;
 
-use std::io;
+use std::{io, env};
 use services::{livro_service::LivroService, membro_service::MembroService};
 use database::Database;
+use iced::Application; // Adicione esta linha
 
 fn main() {
-    let db = Database::new();
-    exibir_menu_principal(&db);
+    let args: Vec<String> = env::args().collect();
+    
+    if args.iter().any(|arg| arg == "--gui") {
+        // Executar versão GUI
+        let db = Database::new();
+        gui::main_window::BibliotecaGUI::run(
+            iced::Settings::with_flags(db)
+        ).expect("Erro ao executar a GUI");
+    } else {
+        // Executar versão CLI
+        let db = Database::new();
+        exibir_menu_principal(&db);
+    }
 }
 
 fn exibir_menu_principal(db: &Database) {
@@ -120,7 +133,6 @@ fn devolver_livro(db: &Database) {
 
 // Adicione estas funções no services ou database
 fn realizar_emprestimo(db: &Database, livro_id: u32, membro_id: u32) -> Result<String, String> {
-    // Acesso direto aos dados sem clonar
     let mut livros = db.get_livros_mutex().lock().unwrap();
     let livro = livros.iter_mut().find(|l| l.id == livro_id)
         .ok_or("Livro não encontrado")?;
